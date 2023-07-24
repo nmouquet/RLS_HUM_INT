@@ -1,0 +1,80 @@
+Package: RLS.HUM.INT
+Type: Package
+Title: Research Compendium of Mouquet et al. 2023
+Version: 0.1
+Authors@R: c(
+    person(given   = "Nicolas",
+           family  = "Mouquet",
+           role    = c("aut", "cre", "cph"),
+           email   = "nicolas.mouquet@cnrs.fr",
+           comment = c(ORCID = "0000-0003-1840-6984")),
+    person(given   = "Juliette",
+           family  = "Langlois",
+           role    = "aut",
+           email   = "juliette.a.langlois@gmail.com"),
+    person(given   = "Nicolas",
+           family  = "Casajus",
+           role    = "aut",
+           email   = "nicolas.casajus@fondationbiodiversite.fr",
+           comment = c(ORCID = "0000-0002-5537-5294")))
+Description: Research compendium to reproduce analyses and figures of the 
+    article 'Low human interest for the most at-risk reef fishes worldwide' by 
+    Mouquet et al.
+URL: https://github.com/nmouquet/RLS_HUM_INT
+BugReports: https://github.com/nmouquet/RLS_HUM_INT/issues
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Depends:
+    car,
+    dismo,
+    dplyr,
+    gbm,
+    ggplot2,
+    ggtree,
+    gridExtra,
+    httr,
+    lubridate,
+    pipeR,
+    phytools,
+    RSelenium,
+    stringi
+Imports: 
+    ade4,
+    ape,
+    devtools,
+    factoextra,
+    FactoMineR,
+    fishtree,
+    ggdist,
+    grid,
+    here,
+    jsonlite,
+    Metrics,
+    openxlsx,
+    pageviews,
+    pbmcapply,
+    pingr,
+    raster,
+    readr,
+    rentrez,
+    rfishbase,
+    rgbif,
+    rscopus,
+    rstatix,
+    rutils,
+    rvest,
+    rwoslite,
+    stats,
+    stringdist,
+    taxize,
+    treezy,
+    usethis,
+    vegan,
+    WikipediR,
+    wikitaxa
+Remotes:
+    frbcesab/rwoslite,
+    njtierney/treezy,
+    bioc::ggtree
