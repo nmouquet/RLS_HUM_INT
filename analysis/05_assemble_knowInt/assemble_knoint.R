@@ -284,6 +284,7 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
     colors_grad <- c('#4575b4', '#74add1', '#abd9e9', '#e0f3f8',
                      '#abe9c7', '#74d186', '#45b455', '#156b15')
     
+    
     #factoextra::fviz_eig(pca_field,main = "Eigenvalues")
     
     ##FIGURE 2A
@@ -304,7 +305,12 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
               axis.title.y = element_text(size=14, face="bold"),
               axis.text.y = element_text(size=12),
               axis.title.x = element_text(size=14, face="bold"),
-              axis.text.x = element_text(size=12))
+              axis.text.x = element_text(size=12))+
+        geom_point(aes(x=pca_field$li$Axis1[which(data_scale$fb_sci_name%in%"Chelon_auratus")],y=pca_field$li$Axis2[which(data_scale$fb_sci_name%in%"Chelon_auratus")]), 
+                   shape=1,
+                   color='black',
+                   size=4)
+        
   
       ggsave(here::here("tables_figures","Fig2a.tiff"),device="tiff",fig2a,width = 17, height = 17, units = "cm",dpi=300)
 
@@ -330,13 +336,13 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
       
       ###find examples to illustrate the figure 
       
-        # df <- data.frame(x=pca_field$li$Axis1, y=pca_field$li$Axis2)
-        # rownames(df) <- data_scale$fb_sci_name
-        # plot(df)
-        # abline(v=0)
-        # abline(h=0)
-        # id_fish <- identifyPch(x=df$x,y=df$y)
-        # rownames(df)[id_fish]
+        df <- data.frame(x=pca_field$li$Axis1, y=pca_field$li$Axis2)
+        rownames(df) <- data_scale$fb_sci_name
+        plot(df)
+        abline(v=0)
+        abline(h=0)
+        id_fish <- identifyPch(x=df$x,y=df$y)
+        rownames(df)[id_fish]
 
     ##We then computed a pca with only each subset of variables 
     ##and used the coordinates on the first axis of the PCA (this take the correlations of variables within each subset of variables)
@@ -399,7 +405,7 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
         
       ###Correlation between acad and public
         
-        #cor.test(final_table$acad, final_table$public, method = "pearson", alternative = "less") # r=0.66 p<0.001
+        #cor.test(final_table$acad, final_table$public, method = "pearson", alternative = "less") # r=0.65 p<0.001
         
     ##FIGURE 2b
     
@@ -493,8 +499,8 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
         
 
         ###Corelation acad public  
-          #cor.test(final_table$acad, final_table$public, method = "pearson", alternative = "greater") # r=-0.7 p<0.001
-          #r=0.67 p<0.001
+          #cor.test(final_table$acad, final_table$public, method = "pearson", alternative = "greater")
+          #r=0.65 p<0.001
         
 #----
 

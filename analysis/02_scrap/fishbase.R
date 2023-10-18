@@ -33,8 +33,6 @@ rm(list = ls())
       error = function(e){ER <- TRUE},
       warning = function(w){ER <- TRUE})
     data_fishbase_1 <- as.data.frame(data_fishbase_1)
-    
-    Sys.sleep(1)
 
     ER <- FALSE
     data_fishbase_2 <- tryCatch({
@@ -44,10 +42,83 @@ rm(list = ls())
     data_fishbase_2 <- as.data.frame(data_fishbase_2)    
     data_fishbase_2 <- data_fishbase_2[(data_fishbase_2$Level=="species in general") | (data_fishbase_2$Species %in% c("Diplodus argenteus","Stichaeus punctatus")),]
 
-    data_fishbase <- merge(data_fishbase_1,data_fishbase_2,by="Species")
+    ER <- FALSE
+    data_fishbase_3 <- tryCatch({
+      rfishbase::ecosystem(sp_list_chunk)},
+      error = function(e){ER <- TRUE},
+      warning = function(w){ER <- TRUE})
+    data_fishbase_3 <- as.data.frame(data_fishbase_3)    
+    
+    data_fishbase_3 <- do.call(rbind,parallel::mclapply(1:length(sp_list_chunk), function(i){
+      natable <- apply(apply(data_fishbase_3[data_fishbase_3$Species%in%sp_list_chunk[i],],1,is.na),1,sum)
+      
+      na_sp <- data.frame(t(cbind(lapply(natable, function(x){
+        if (x>1) "NA" else "Values"
+      }))))
+      na_sp$Species <- sp_list_chunk[[i]]
+      na_sp
+      
+    },mc.cores=parallel::detectCores()-2))
+    
+    ER <- FALSE
+    data_fishbase_4 <- tryCatch({
+      rfishbase::estimate(sp_list_chunk)},
+      error = function(e){ER <- TRUE},
+      warning = function(w){ER <- TRUE})
+    data_fishbase_4 <- as.data.frame(data_fishbase_4)    
+
+    ER <- FALSE
+    data_fishbase_5 <- tryCatch({
+      rfishbase::ecology(sp_list_chunk)},
+      error = function(e){ER <- TRUE},
+      warning = function(w){ER <- TRUE})
+    data_fishbase_5 <- as.data.frame(data_fishbase_5) 
+    dim_na <- dim(data_fishbase_5)[1]
+    data_fishbase_5[(dim_na+1):length(sp_list_chunk),]=NA
+    data_fishbase_5$Species[(dim_na+1):length(sp_list_chunk)] <- sp_list_chunk[!sp_list_chunk%in%data_fishbase_5$Species]
+
+    ER <- FALSE
+    data_fishbase_6 <- tryCatch({
+      rfishbase::reproduction(sp_list_chunk)},
+      error = function(e){ER <- TRUE},
+      warning = function(w){ER <- TRUE})
+    data_fishbase_6 <- as.data.frame(data_fishbase_6)    
+    dim_na <- dim(data_fishbase_6)[1]
+    data_fishbase_6[(dim_na+1):length(sp_list_chunk),]=NA
+    data_fishbase_6$Species[(dim_na+1):length(sp_list_chunk)] <- sp_list_chunk[!sp_list_chunk%in%data_fishbase_6$Species]
+    
+    
+    #Merge 
+    #remove Expert|Modified|Entered|Checked|Ref
+    #remove all the variable with Ref in it 
+      data_fishbase <- merge(data_fishbase_1,data_fishbase_2,by="Species")
+      rem_var <- colnames(data_fishbase)[stringr::str_detect(colnames(data_fishbase), c("Expert|Modified|Entered|Checked|Ref|Pic|Remark|MEOW|EcosystemName|EcosystemURL|Add\\.y"))]
+      data_fishbase <- data_fishbase[,!names(data_fishbase) %in% rem_var]
+      colnames(data_fishbase) <- gsub("\\.x","",colnames(data_fishbase))
+      
+      data_fishbase <- merge(data_fishbase,data_fishbase_3,by="Species")
+      rem_var <- colnames(data_fishbase)[stringr::str_detect(colnames(data_fishbase), c("Expert|Modified|Entered|Checked|Ref|Pic|Remark|MEOW|EcosystemName|EcosystemURL|Add\\.y"))]
+      data_fishbase <- data_fishbase[,!names(data_fishbase) %in% rem_var]
+      colnames(data_fishbase) <- gsub("\\.x","",colnames(data_fishbase))
+      
+      data_fishbase <- merge(data_fishbase,data_fishbase_4,by="Species")
+      rem_var <- colnames(data_fishbase)[stringr::str_detect(colnames(data_fishbase), c("Expert|Modified|Entered|Checked|Ref|Pic|Remark|MEOW|EcosystemName|EcosystemURL|Add\\.y"))]
+      data_fishbase <- data_fishbase[,!names(data_fishbase) %in% rem_var]
+      colnames(data_fishbase) <- gsub("\\.x","",colnames(data_fishbase))
+      
+      data_fishbase <- merge(data_fishbase,data_fishbase_5,by="Species")
+      rem_var <- colnames(data_fishbase)[stringr::str_detect(colnames(data_fishbase), c("Expert|Modified|Entered|Checked|Ref|Pic|Remark|MEOW|EcosystemName|EcosystemURL|Add\\.y"))]
+      data_fishbase <- data_fishbase[,!names(data_fishbase) %in% rem_var]
+      colnames(data_fishbase) <- gsub("\\.x","",colnames(data_fishbase))
+      
+      data_fishbase <- merge(data_fishbase,data_fishbase_6,by="Species")
+      rem_var <- colnames(data_fishbase)[stringr::str_detect(colnames(data_fishbase), c("Expert|Modified|Entered|Checked|Ref|Pic|Remark|MEOW|EcosystemName|EcosystemURL|Add\\.y"))]
+      data_fishbase <- data_fishbase[,!names(data_fishbase) %in% rem_var]
+      colnames(data_fishbase) <- gsub("\\.x","",colnames(data_fishbase))
+      
     save(data_fishbase,file=here::here("results","02_scrap","fishbase","chunks",paste0("data_fishbase_chunk_",i,".RData")))
     
-    Sys.sleep(2)
+    Sys.sleep(1)
     
   }
 
