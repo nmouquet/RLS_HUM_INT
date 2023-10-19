@@ -57,7 +57,7 @@ n_cells <- unlist(pbmcapply::pbmclapply(species, function(sp) {
   xy_berg <- sf::st_transform(xy, crs = sf::st_crs(behrmann))
 
   
-  raster::cellFromXY(world_grid, xy_berg) |> 
+  raster::cellFromXY(world_grid, sf::st_coordinates(xy_berg)) |> 
     unique() |> 
     length()
 }, mc.cores = mc_cores))
