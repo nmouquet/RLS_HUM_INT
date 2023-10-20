@@ -8,6 +8,8 @@ res      <- 0.1
 mc_cores <- parallel::detectCores()-1
 proj     <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
 
+behrmann <- "+proj=cea +lat_ts=30 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs"
+
 ## Create World grid -----
 
 world_grid <- raster::raster(res = res, xmn = -180, xmx = 180, ymn = -90,
@@ -15,7 +17,7 @@ world_grid <- raster::raster(res = res, xmn = -180, xmx = 180, ymn = -90,
                              crs = proj)
 
 world_grid[] <- NA
-
+world_grid <- raster::projectRaster(world_grid, crs = behrmann)
 
 ## List csv files ----
 
@@ -50,16 +52,19 @@ n_gbif_records <- unlist(pbmcapply::pbmclapply(species, function(sp) {
 n_cells <- unlist(pbmcapply::pbmclapply(species, function(sp) {
   
   gbif_subset <- subset(gbif_records, gbif_records$"species" == sp)
+
+  xy <- sf::st_as_sf(gbif_subset, coords = c("decimalLongitude", "decimalLatitude"), crs = proj)
+  xy_berg <- sf::st_transform(xy, crs = sf::st_crs(behrmann))
+
   
-  raster::cellFromXY(world_grid, 
-                     gbif_subset[ , c("decimalLongitude", "decimalLatitude")]) |> 
+  raster::cellFromXY(world_grid, sf::st_coordinates(xy_berg)) |> 
     unique() |> 
     length()
 }, mc.cores = mc_cores))
 
-species_range <- data.frame("gbif_valid_name"        = species, 
+species_range <- data.frame("gbif_valid_name" = species, 
                             "GBIF_NC_records" = n_gbif_records,
-                            "GBIF_NC_n_cells"        = n_cells)
+                            "GBIF_NC_n_cells" = n_cells)
 
 colnames(species_range)[3] <- paste0("GBIF_NC_n_cells_",gsub("\\.","",as.character(res)))
 
