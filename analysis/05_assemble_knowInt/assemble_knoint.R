@@ -89,13 +89,22 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
 
 #GBIF 
   
+  gbif001 <- read.csv(here::here("results","03_gbif","species_range_size_001.csv"))
+  gbif001 <- gbif001[,c("fb_sci_name","GBIF_NC_records","GBIF_NC_n_cells_001")]
+  
   gbif005 <- read.csv(here::here("results","03_gbif","species_range_size_005.csv"))
-  gbif005 <- gbif005[,c("fb_sci_name","GBIF_NC_records","GBIF_NC_n_cells_005")]
+  gbif005 <- gbif005[,c("fb_sci_name","GBIF_NC_n_cells_005")]
   
   gbif01 <- read.csv(here::here("results","03_gbif","species_range_size_01.csv"))
   gbif01 <- gbif01[,c("fb_sci_name","GBIF_NC_n_cells_01")]
   
-  gbif <- merge(gbif005,gbif01)
+  gbif05 <- read.csv(here::here("results","03_gbif","species_range_size_05.csv"))
+  gbif05 <- gbif05[,c("fb_sci_name","GBIF_NC_n_cells_05")]
+  
+  gbif <- merge(gbif001,gbif005)
+  gbif <- merge(gbif,gbif01)
+  gbif <- merge(gbif,gbif05)
+  
   gbif$fb_sci_name <- gsub(" ","_",gbif$fb_sci_name)
   
 #SCHOLARS
@@ -228,7 +237,10 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
 
   ##Species range & occurrences 
     
+    final_table$Range_001 <- norm01(log10(1+RLS_final$GBIF_NC_n_cells_001))
     final_table$Range_005 <- norm01(log10(1+RLS_final$GBIF_NC_n_cells_005))
+    final_table$Range_01 <- norm01(log10(1+RLS_final$GBIF_NC_n_cells_01))
+    final_table$Range_05 <- norm01(log10(1+RLS_final$GBIF_NC_n_cells_05))
     
 #----
     
@@ -309,6 +321,26 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
         geom_point(aes(x=pca_field$li$Axis1[which(data_scale$fb_sci_name%in%"Chelon_auratus")],y=pca_field$li$Axis2[which(data_scale$fb_sci_name%in%"Chelon_auratus")]), 
                    shape=1,
                    color='black',
+                   size=4)+
+        geom_point(aes(x=pca_field$li$Axis1[which(data_scale$fb_sci_name%in%"Pseudanthias_pleurotaenia")],y=pca_field$li$Axis2[which(data_scale$fb_sci_name%in%"Pseudanthias_pleurotaenia")]), 
+                   shape=1,
+                   color='black',
+                   size=4)+
+        geom_point(aes(x=pca_field$li$Axis1[which(data_scale$fb_sci_name%in%"Synchiropus_splendidus")],y=pca_field$li$Axis2[which(data_scale$fb_sci_name%in%"Synchiropus_splendidus")]), 
+                   shape=1,
+                   color='black',
+                   size=4)+
+        geom_point(aes(x=pca_field$li$Axis1[which(data_scale$fb_sci_name%in%"Pterois_volitans")],y=pca_field$li$Axis2[which(data_scale$fb_sci_name%in%"Pterois_volitans")]), 
+                   shape=1,
+                   color='black',
+                   size=4)+
+        geom_point(aes(x=pca_field$li$Axis1[which(data_scale$fb_sci_name%in%"Pollachius_virens")],y=pca_field$li$Axis2[which(data_scale$fb_sci_name%in%"Pollachius_virens")]), 
+                   shape=1,
+                   color='black',
+                   size=4)+
+        geom_point(aes(x=pca_field$li$Axis1[which(data_scale$fb_sci_name%in%"Lutjanus_guttatus")],y=pca_field$li$Axis2[which(data_scale$fb_sci_name%in%"Lutjanus_guttatus")]), 
+                   shape=1,
+                   color='black',
                    size=4)
         
   
@@ -336,13 +368,54 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
       
       ###find examples to illustrate the figure 
       
-        df <- data.frame(x=pca_field$li$Axis1, y=pca_field$li$Axis2)
-        rownames(df) <- data_scale$fb_sci_name
-        plot(df)
-        abline(v=0)
-        abline(h=0)
-        id_fish <- identifyPch(x=df$x,y=df$y)
-        rownames(df)[id_fish]
+        # df <- data.frame(x=pca_field$li$Axis1, y=pca_field$li$Axis2)
+        # rownames(df) <- data_scale$fb_sci_name
+        # plot(df)
+        # abline(v=0)
+        # abline(h=0)
+        # id_fish <- identifyPch(x=df$x,y=df$y)
+        # rownames(df)[id_fish]
+      
+    figS2a_text <- factoextra::fviz_pca_biplot(pca_field,
+                                                axes = c(3, 4),
+                                                col.ind       = data_scale$Range,
+                                                geom          = "point",
+                                                gradient.cols = colors_grad,
+                                                repel         = TRUE,
+                                                col.var       = "#575656",
+                                                geom.var      = c("arrow", "text"),
+                                                alpha.ind     = 0.9,
+                                                ggtheme       = theme_bw(),
+                                                pointsize     = 2)+
+        labs(col="Range", title = " ") +
+        theme(legend.position="none",
+              axis.title.y = element_text(size=14,face="bold"),
+              axis.text.y = element_text(size=12),
+              axis.title.x = element_text(size=14,face="bold"),
+              axis.text.x = element_text(size=12))
+      
+      ggsave(here::here("tables_figures","figS2a_text.tiff"),device="tiff",figS2a_text,width = 17, height = 17, units = "cm",dpi=300)
+      
+    figS2b_text <- factoextra::fviz_pca_biplot(pca_field,
+                                                 axes = c(5, 6),
+                                                 col.ind       = data_scale$Range,
+                                                 geom          = "point",
+                                                 gradient.cols = colors_grad,
+                                                 repel         = TRUE,
+                                                 col.var       = "#575656",
+                                                 geom.var      = c("arrow", "text"),
+                                                 alpha.ind     = 0.9,
+                                                 ggtheme       = theme_bw(),
+                                                 pointsize     = 2)+
+        labs(col="Range", title = " ") +
+        theme(legend.position="none",
+              axis.title.y = element_text(size=14,face="bold"),
+              axis.text.y = element_text(size=12),
+              axis.title.x = element_text(size=14,face="bold"),
+              axis.text.x = element_text(size=12))
+      
+      ggsave(here::here("tables_figures","figS2b_text.tiff"),device="tiff",figS2b_text,width = 17, height = 17, units = "cm",dpi=300)
+      
 
     ##We then computed a pca with only each subset of variables 
     ##and used the coordinates on the first axis of the PCA (this take the correlations of variables within each subset of variables)
@@ -447,6 +520,7 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
         library(ggplot2)
         fig2b <- ggplot(final_table, aes(x=acad, y=public, color=Range_005)) +
                     geom_point(alpha=1,size=2) +
+                    geom_smooth(method = lm,colour="gray")+
                     scale_colour_gradientn(colours = colors_grad)+
                     xlim(0,1)+ylim(0,1)+
                     xlab("Research effort")+ylab("Public attention")+
@@ -461,7 +535,7 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
                           axis.title.x = element_text(size=14,face="bold"),
                           axis.text.x = element_text(size=12))+
                     labs(color=NULL)+
-                    geom_abline (slope=1, linetype = "dashed", color="black",alpha=0.5)+
+                    #geom_abline (slope=1, linetype = "dashed", color="black",alpha=0.5)+
                     geom_point(aes(x=final_table$acad[final_table$fb_sci_name%in%Top_int_1],y=final_table$public[final_table$fb_sci_name%in%Top_int_1]), 
                                shape=1,
                                color='black',
@@ -501,6 +575,10 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
         ###Corelation acad public  
           #cor.test(final_table$acad, final_table$public, method = "pearson", alternative = "greater")
           #r=0.65 p<0.001
+        
+        ###hexbin plot produced for reviewer #2
+          #hbin <- hexbin::hexbin(final_table$acad,final_table$public, xbins = 40)
+          #hexbin::plot(hbin)
         
 #----
 

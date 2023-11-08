@@ -115,7 +115,7 @@ visu_fam <- function(name_fam) {
 
 #----
 
-#BRT analysis FIGURE 3, FIGURE PARTIAL PLOTS----
+#BRT raw USED IN THE INITIAL ANALYSIS: NOT ANYMORE (keeped for archive)----
 
 data_tab <- final_table
 names(data_tab)[names(data_tab) == 'Range_005'] <- 'Range'
@@ -224,6 +224,175 @@ id_var <- c(id_var,range)
   
   #figS1_B <- do.call("grid.arrange", c(l_public_brt, ncol=3))
   #ggsave(file=here::here("tables_figures","FIG_S1_B.tiff"), figS1_B,width = 20, height = 16, dpi = 300, units = "cm", device='tiff') 
+
+#----
+  
+#GBM analysis, FIGURE 3----
+  
+data_tab <- final_table
+names(data_tab)[names(data_tab) == 'Range_005'] <- 'Range'
+names(data_tab)[names(data_tab) == 'Evol_age'] <- 'Species_age'
+names(data_tab)[names(data_tab) == 'Length'] <- 'Body_size'
+  
+id_var <- c("Aesthetic","Coralness","Benthicness","Diel_activity","Body_size","Trophic_level","Temperature","Fishery","Aquaculture","Aquarium","Price","Species_age")
+range <- "Range"
+id_var <- c(id_var,range)
+
+data_tab <- data_tab[,c("acad","public",id_var)]
+
+#corrgram::corrgram(data_tab,lower.panel=corrgram::panel.cor, upper.panel=corrgram::panel.shade)
+
+  ##gbm general 
+    mod.acad <- gbm::gbm(as.formula(paste("acad"," ~ ", paste(id_var, collapse= "+"))), 
+               data = data_tab,
+               interaction.depth = 4,shrinkage = 0.01,n.trees = 2000,distribution = "gaussian",n.cores = 12)
+    
+    mod.public <- gbm::gbm(as.formula(paste("public"," ~ ", paste(id_var, collapse= "+"))), 
+                           data = data_tab,
+                           interaction.depth = 4,shrinkage = 0.01,n.trees = 2000,distribution = "gaussian",
+                           n.cores = 12)
+
+    best.iter.acad <- gbm::gbm.perf(mod.acad, method = "OOB")
+    best.iter.public <- gbm::gbm.perf(mod.public, method = "OOB")
+
+  R2.acad <- cor(data_tab$acad,predict(mod.acad,data=data_tab,n.trees = best.iter.acad))^2
+  Imp_var.acad <- summary(mod.acad, n.trees = best.iter.acad)
+  Par_dep.acad <- lapply(Imp_var.acad$var,function(id){
+    # id <- Imp_var$var[1]
+    treezy::partial_dependence(mod.acad, var=id)
+  })
+  names(Par_dep.acad) <- Imp_var.acad$var
+
+  R2.public <- cor(data_tab$public,predict(mod.public,data=data_tab,n.trees = best.iter.public))^2
+  
+  Imp_var.public<- summary(mod.public, n.trees = best.iter.public)
+  Par_dep.public <- lapply(Imp_var.public$var,function(id){
+    # id <- Imp_var$var[1]
+    treezy::partial_dependence(mod.public, var=id)
+  })
+  names(Par_dep.public) <- Imp_var.public$var
+
+  ##gbm removing variable to measure the importance 
+  
+    var_imp <- do.call(rbind,lapply(id_var, function(id){
+    
+    #id <- id_var[1]
+    
+    id_var.less <- id_var[-which(id_var%in%id)]
+  
+    mod.acad.less <- gbm::gbm(as.formula(paste("acad"," ~ ", paste(id_var.less, collapse= "+"))), 
+                              data = data_tab,
+                              interaction.depth = 4,shrinkage = 0.01,n.trees = 1000,distribution = "gaussian",n.cores = 12)
+    
+    mod.public.less <- gbm::gbm(as.formula(paste("public"," ~ ", paste(id_var.less, collapse= "+"))), 
+                              data = data_tab,
+                              interaction.depth = 4,shrinkage = 0.01,n.trees = 1000,distribution = "gaussian",n.cores = 12)
+    
+    best.iter.acad.less <- gbm::gbm.perf(mod.acad.less, method = "OOB")
+    best.iter.public.less <- gbm::gbm.perf(mod.public.less, method = "OOB")
+    
+    R2.acad.less <- cor(data_tab$acad,predict(mod.acad.less,data=data_tab,n.trees = best.iter.acad.less))^2
+    R2.public.less <- cor(data_tab$public,predict(mod.public.less,data=data_tab,n.trees = best.iter.public.less))^2
+    
+    if(R2.acad.less>R2.acad) R2.acad.less=R2.acad
+    if(R2.public.less>R2.public) R2.public.less=R2.public
+    
+    imp.acad.less <- 100*(1-(R2.acad.less/R2.acad))
+    imp.public.less <- 100*(1-(R2.public.less/R2.public))
+    
+    imp.acad.gbm <- Imp_var.acad$rel.inf[which(Imp_var.acad$var%in%id)]
+    imp.public.gbm <-  Imp_var.public$rel.inf[which(Imp_var.public$var%in%id)]
+  
+    cbind.data.frame(var=id,R2.acad=R2.acad,R2.acad.less=R2.acad.less,
+                     imp.acad.less=imp.acad.less,imp.acad.gbm=imp.acad.gbm,
+                     R2.public=R2.public,R2.public.less=R2.public.less,
+                     imp.public.less=imp.public.less,imp.public.gbm=imp.public.gbm)
+    
+    }))
+    
+    var_imp$imp.acad.less.per <- 100*(var_imp$imp.acad.less/sum(var_imp$imp.acad.less))
+    var_imp$imp.public.less.per <- 100*(var_imp$imp.public.less/sum(var_imp$imp.public.less))
+    
+    #cor(var_imp$imp.acad.less.per,var_imp$imp.acad.gbm)^2 R2=0.95
+    #cor(var_imp$imp.public.less.per,var_imp$imp.public.gbm)^2 #R2=0.93
+    
+  
+  ##plot the variables importance (Figure 3)
+   
+    var_imp <- var_imp[order(var_imp$imp.acad.less.per,decreasing = T),]
+    
+    var_imp$var = factor(var_imp$var, levels = rev(var_imp$var), ordered = TRUE)
+  
+    a <- ggplot(var_imp, aes(x=var, y=imp.acad.less.per,fill=100-imp.acad.less.per))+ 
+      geom_bar(stat="identity", position="dodge")+ coord_flip()+
+      #scale_fill_gradient2(low = "white",high = "blue") +
+      scale_fill_viridis_c(begin = 0.5,
+                           end = 1)+
+      ylab("Variable Importance (%)")+
+      xlab("")+
+      ylim(0,60)+
+      ggtitle(paste0("Research effort"," r2 = ",round(R2.acad,2)))+
+      guides(fill=F)+ theme_bw()+
+      theme(plot.title = element_text(size=18, face="bold"),
+            axis.text.y = element_text(size=13, face="bold"),
+            axis.title.x = element_text(size=15, face="bold"),
+            axis.text.x = element_text(size=10))
+    
+    b <- ggplot(var_imp, aes(x=var, y=imp.public.less.per,fill=100-imp.public.less.per))+ 
+      geom_bar(stat="identity", position="dodge")+ coord_flip()+
+      scale_fill_viridis_c(begin = 0.5,
+                           end = 1)+
+      ylab("Variable Importance (%)")+
+      xlab("")+
+      ylim(0,60)+
+      ggtitle(paste0("Public attention"," r2 = ",round(R2.public,2)))+
+      guides(fill=F)+ theme_bw()+
+      theme(plot.title = element_text(size=18, face="bold"),
+            axis.text.y = element_text(size=13, face="bold"),
+            axis.title.x = element_text(size=15, face="bold"),
+            axis.text.x = element_text(size=10))
+    
+    fig3_main <- gridExtra::grid.arrange(a,b,ncol=2)
+    
+    ggsave(file=here::here("tables_figures","FIG_3.tiff"), fig3_main,width = 35, height = 18, dpi = 300, units = "cm", device='tiff') 
+
+  ##partial plots (Figure 3)
+
+    var_imp <- var_imp[order(var_imp$imp.acad.less.per,decreasing = T),]
+    partial_acad_gbm <- lapply(as.character(var_imp$var[1:6]), function(id)
+    {
+      #id <- var_imp$var[1]
+      ggplot(Par_dep.acad[[id]], aes(x=value, y=fitted_function))+ 
+        geom_point(shape=21,fill="#eeeeee",color="#808080") +
+        scale_y_continuous(labels = scales::number_format(accuracy = 0.01))+
+        geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"))+
+        ylab("Fitted values")+xlab("values")+ggtitle(paste0(names(Par_dep.acad[id]),"  (",round(var_imp$imp.acad.less.per[var_imp$var%in%id],1),"%)"))+
+        theme_bw()+
+        theme(plot.title = element_text(size=10, face="bold"),
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank())
+    })
+    
+    var_imp <- var_imp[order(var_imp$imp.public.less.per,decreasing = T),]
+    partial_public_gbm <- lapply(as.character(var_imp$var[1:6]), function(id)
+    {
+      ggplot(Par_dep.public[[id]], aes(x=value, y=fitted_function))+ 
+        geom_point(shape=21,fill="#eeeeee",color="#808080") +
+        scale_y_continuous(labels = scales::number_format(accuracy = 0.01))+
+        geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"))+
+        ylab("Fitted values")+xlab("values")+ggtitle(paste0(names(Par_dep.public[id]),"  (",round(var_imp$imp.public.less.per[var_imp$var%in%id],1),"%)"))+
+        theme_bw()+
+        theme(plot.title = element_text(size=10, face="bold"),
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank())
+    })
+    
+    library(gridExtra)
+    fig3_left <- do.call("grid.arrange", c(partial_acad_gbm, ncol=2))
+    ggsave(file=here::here("tables_figures","FIG_3_left.tiff"), fig3_left,width = 9.7, height = 14, dpi = 300, units = "cm", device='tiff') 
+    
+    fig3_right <- do.call("grid.arrange", c(partial_public_gbm, ncol=2))
+    ggsave(file=here::here("tables_figures","FIG_3_right.tiff"), fig3_right,width = 9.7, height = 14, dpi = 300, units = "cm", device='tiff') 
 
 #----
 
@@ -799,6 +968,11 @@ id_var <- c(id_var,range)
     #cor.test(THR_final_table$ClimVuln_SSP585, THR_final_table$public, method = "pearson", alternative = "less") # r=-0.7 p<0.001
     #TH public r=-0.53 p<0.001
   
+  #correlation between climate risk index and species range 
+  
+    #cor.test(final_table$ClimVuln_SSP585,final_table$Range_005, method = "pearson", alternative = "less")
+    #r=-0.43 p<0.001
+    
   ### find coordinates of fish to illustrate
     # identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
     # {

@@ -300,6 +300,7 @@ rm(list = ls())
 #SCRAP THEM ALL----
 
   RLS_species <- read.csv2(here::here("results","01_build_species_list","RLS_species_init.csv"))
+  #https://www.kaggle.com/datasets/maksymshkliarevskyi/scopus-source-list
   SCOPUS <- read.csv(here::here("data", "scopus", "CS_2019.csv"))  
   SCOPUS_source <- unique(SCOPUS$Title)
   
@@ -315,7 +316,7 @@ rm(list = ls())
   for (i in 1:toend) {
   #i=1
   sp_id <- feed_the_WTA[i]
-  #sp_id <- "Suezichthys devisi"
+  #sp_id <- "Jenkinsia lamprotaenia"
   
   still=still-1
   

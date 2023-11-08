@@ -2,10 +2,10 @@ rm(list = ls())
 
 
 ## Params ----
-#DO with res=0.05 and 0.1 
+#DO with res=0.01, 0.05, 0.1, 0.5
 
-res      <- 0.1
-mc_cores <- parallel::detectCores()-1
+res      <- 0.5
+mc_cores <- parallel::detectCores()
 proj     <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
 
 behrmann <- "+proj=cea +lat_ts=30 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs"
