@@ -9,7 +9,7 @@
 #'  - pagel_acad.csv and pagel_public.csv
 #'  - Figure 5
 #'  - Figure 6
-#'  - Figure S2
+#'  - Figure S3
 #'         
 #' @date 2023/05/06
 ##################################################################################################
@@ -446,7 +446,7 @@ data_tab <- data_tab[,c("acad","public",id_var)]
   ## build the phylo_table for the variable of interest and select the species set
   ## all the section must be run for each variable of interest
 
-    var_interet <- "public" #can be public or acad
+    var_interet <- "acad" #can be public or acad
     phylo_table <- final_table
 
     ### Scaridae is a subfamily of the Labridae according to F. Leprieur so we merge them
@@ -616,17 +616,17 @@ data_tab <- data_tab[,c("acad","public",id_var)]
         time.taken <- end.time - start.time
         time.taken
   
-        mean(pagel$lambda) #acad = 0.62 public = 0.45
+        #mean(pagel$lambda) #acad = 0.58 public = 0.43
         
         lambda <- data.frame(lambda=pagel$lambda)
         write.csv2(lambda,here::here("results","06_main_analysis",paste0("pagel_",var_interet,".csv")))
   
-        ggplot(pagel, aes(x=lambda)) +
-          geom_density(fill="gray")+
-          geom_vline(aes(xintercept=mean(lambda)), color="blue",
-                     linetype="dashed")+
-          labs(title=var_interet,x=var_interet, y = "Density")+xlim(0,1)+
-          theme_classic()
+        # ggplot(pagel, aes(x=lambda)) +
+        #   geom_density(fill="gray")+
+        #   geom_vline(aes(xintercept=mean(lambda)), color="blue",
+        #              linetype="dashed")+
+        #   labs(title=var_interet,x=var_interet, y = "Density")+xlim(0,1)+
+        #   theme_classic()
         
 #----   
 
@@ -728,17 +728,17 @@ data_tab <- data_tab[,c("acad","public",id_var)]
         Q_public <- as.numeric(quantile(x <- final_table$public,probs = seq(0, 1, 0.1))[10])
         Q_acad <- as.numeric(quantile(x <- final_table$acad,probs = seq(0, 1, 0.1))[10])
         
-        sum((THR_final_table$acad>Q_acad) & (THR_final_table$public>Q_public)) # 15 
-        100*(sum((THR_final_table$acad>Q_acad) & (THR_final_table$public>Q_public)))/nrow(THR_final_table) # 7.9%
+        sum((THR_final_table$acad>Q_acad) & (THR_final_table$public>Q_public)) # 14 
+        100*(sum((THR_final_table$acad>Q_acad) & (THR_final_table$public>Q_public)))/nrow(THR_final_table) # 6.3%
 
-        sum((LC_final_table$acad>Q_acad) & (LC_final_table$public>Q_public)) # 86 
-        100*(sum((LC_final_table$acad>Q_acad) & (LC_final_table$public>Q_public)))/nrow(LC_final_table) # 4.7
+        sum((LC_final_table$acad>Q_acad) & (LC_final_table$public>Q_public)) # 89 
+        100*(sum((LC_final_table$acad>Q_acad) & (LC_final_table$public>Q_public)))/nrow(LC_final_table) # 4.9
         
         sum((DD_final_table$acad>Q_acad) & (DD_final_table$public>Q_public)) # 4 
         100*(sum((DD_final_table$acad>Q_acad) & (DD_final_table$public>Q_public)))/nrow(DD_final_table) # 5.7
         
-        sum((NE_final_table$acad>Q_acad) & (NE_final_table$public>Q_public)) # 5 
-        100*(sum((NE_final_table$acad>Q_acad) & (NE_final_table$public>Q_public)))/nrow(NE_final_table) # 1.5
+        sum((NE_final_table$acad>Q_acad) & (NE_final_table$public>Q_public)) # 6 
+        100*(sum((NE_final_table$acad>Q_acad) & (NE_final_table$public>Q_public)))/nrow(NE_final_table) # 1.7
         
         lc <- grid::grobTree(grid::textGrob(paste0("(LC) Least Concern, n= ",dim(LC_final_table)[1]), x=0.03,  y=1.15, hjust=-0.1,
                                             gp=grid::gpar(col="black", fontsize=12)))
@@ -959,13 +959,13 @@ data_tab <- data_tab[,c("acad","public",id_var)]
   ggsave(file=here::here("tables_figures","FIG_6.tiff"), fig6,width = 25, height = 10, dpi = 300, units = "cm", device='tiff') 
   
   #correlation with acad
-    #cor.test(final_table$ClimVuln_SSP585, final_table$acad, method = "pearson", alternative = "less") # r=-0.7 p<0.001
+    #cor.test(final_table$ClimVuln_SSP585, final_table$acad, method = "pearson", alternative = "less") # 
     #ALL acad r=-0.30 p<0.001
-    #cor.test(THR_final_table$ClimVuln_SSP585, THR_final_table$acad, method = "pearson", alternative = "less") # r=-0.7 p<0.001
-    #TH acad r=-0.58 p<0.001
-    #cor.test(final_table$ClimVuln_SSP585, final_table$public, method = "pearson", alternative = "less") # r=-0.7 p<0.001
+    #cor.test(THR_final_table$ClimVuln_SSP585, THR_final_table$acad, method = "pearson", alternative = "less") # 
+    #TH acad r=-0.57 p<0.001
+    #cor.test(final_table$ClimVuln_SSP585, final_table$public, method = "pearson", alternative = "less") # 
     #ALL public r=-0.3 p<0.001
-    #cor.test(THR_final_table$ClimVuln_SSP585, THR_final_table$public, method = "pearson", alternative = "less") # r=-0.7 p<0.001
+    #cor.test(THR_final_table$ClimVuln_SSP585, THR_final_table$public, method = "pearson", alternative = "less") # 
     #TH public r=-0.53 p<0.001
   
   #correlation between climate risk index and species range 
@@ -997,7 +997,7 @@ data_tab <- data_tab[,c("acad","public",id_var)]
 
 #----
   
-#Climate vulnerability  FIGURE S2----
+#Climate vulnerability  FIGURE S3----
   #data from https://www.nature.com/articles/s41558-022-01437-y
   
   library(dplyr)
@@ -1049,17 +1049,17 @@ data_tab <- data_tab[,c("acad","public",id_var)]
     ylab("Public attention")+xlab("Climate vulnerability (SSP1-2.6)")+
     theme(legend.position = "none")
   
-  figS2 <- gridExtra::grid.arrange(a,b,ncol=2)
-  ggsave(file=here::here("tables_figures","FIG_S2.tiff"), figS2,width = 25, height = 10, dpi = 300, units = "cm", device='tiff') 
+  figS3 <- gridExtra::grid.arrange(a,b,ncol=2)
+  ggsave(file=here::here("tables_figures","FIG_S3.tiff"), figS3,width = 25, height = 10, dpi = 300, units = "cm", device='tiff') 
   
   #corelation with ClimVuln_SSP126
-  #cor.test(final_table$ClimVuln_SSP126, final_table$acad, method = "pearson", alternative = "less") # r=-0.7 p<0.001
+  #cor.test(final_table$ClimVuln_SSP126, final_table$acad, method = "pearson", alternative = "less") # 
   #ALL acad r=-0.19 p<0.001
-  #cor.test(THR_final_table$ClimVuln_SSP126, THR_final_table$acad, method = "pearson", alternative = "less") # r=-0.7 p<0.001
+  #cor.test(THR_final_table$ClimVuln_SSP126, THR_final_table$acad, method = "pearson", alternative = "less") # 
   #TH acad r=-0.45 p<0.001
-  #cor.test(final_table$ClimVuln_SSP126, final_table$public, method = "pearson", alternative = "less") # r=-0.7 p<0.001
+  #cor.test(final_table$ClimVuln_SSP126, final_table$public, method = "pearson", alternative = "less") # 
   #ALL public r=-0.23 p<0.001
-  #cor.test(THR_final_table$ClimVuln_SSP126, THR_final_table$public, method = "pearson", alternative = "less") # r=-0.7 p<0.001
+  #cor.test(THR_final_table$ClimVuln_SSP126, THR_final_table$public, method = "pearson", alternative = "less") # 
   #TH public r=-0.43 p<0.001
   
  

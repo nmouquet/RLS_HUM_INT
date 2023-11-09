@@ -169,7 +169,9 @@ The following Figures and Tables can be reproduced with the script indicated in 
 
 - [Figure S1](https://github.com/nmouquet/RLS_HUM_INT/tree/main/tables_figures) was produced by [`05_assemble_knowint/assemble_knoint.R`](https://github.com/nmouquet/RLS_HUM_INT/blob/main/analysis/05_assemble_knowint/assemble_knoint.R)
 
-- [Figure S2](https://github.com/nmouquet/RLS_HUM_INT/tree/main/tables_figures) was produced by [`06_main_analysis/main_analysis.R`](https://github.com/nmouquet/RLS_HUM_INT/blob/main/analysis/06_main_analysis/main_analysis.R)
+- [Figure S2](https://github.com/nmouquet/RLS_HUM_INT/tree/main/tables_figures) was produced by [`05_assemble_knowint/assemble_knoint.R`](https://github.com/nmouquet/RLS_HUM_INT/blob/main/analysis/05_assemble_knowint/assemble_knoint.R)
+
+- [Figure S3](https://github.com/nmouquet/RLS_HUM_INT/tree/main/tables_figures) was produced by [`06_main_analysis/main_analysis.R`](https://github.com/nmouquet/RLS_HUM_INT/blob/main/analysis/06_main_analysis/main_analysis.R)
 
 
 

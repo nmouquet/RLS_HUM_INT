@@ -6,7 +6,7 @@
 #' 
 #'  Produce 
 #'    - Figure 2A, 2B
-#'    - Figure S1 
+#'    - Figure S1, S2 
 #'    - 05_Human_Interest_final_table.csv
 #'
 #'         
