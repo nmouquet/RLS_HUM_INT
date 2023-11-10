@@ -959,13 +959,13 @@ data_tab <- data_tab[,c("acad","public",id_var)]
   ggsave(file=here::here("tables_figures","FIG_6.tiff"), fig6,width = 25, height = 10, dpi = 300, units = "cm", device='tiff') 
   
   #correlation with acad
-    #cor.test(final_table$ClimVuln_SSP585, final_table$acad, method = "pearson", alternative = "less") # 
+    #cor.test(final_table$ClimVuln_SSP585, final_table$acad, method = "pearson", alternative = "less") 
     #ALL acad r=-0.30 p<0.001
-    #cor.test(THR_final_table$ClimVuln_SSP585, THR_final_table$acad, method = "pearson", alternative = "less") # 
+    #cor.test(THR_final_table$ClimVuln_SSP585, THR_final_table$acad, method = "pearson", alternative = "less") 
     #TH acad r=-0.57 p<0.001
-    #cor.test(final_table$ClimVuln_SSP585, final_table$public, method = "pearson", alternative = "less") # 
+    #cor.test(final_table$ClimVuln_SSP585, final_table$public, method = "pearson", alternative = "less") 
     #ALL public r=-0.3 p<0.001
-    #cor.test(THR_final_table$ClimVuln_SSP585, THR_final_table$public, method = "pearson", alternative = "less") # 
+    #cor.test(THR_final_table$ClimVuln_SSP585, THR_final_table$public, method = "pearson", alternative = "less") 
     #TH public r=-0.53 p<0.001
   
   #correlation between climate risk index and species range 
