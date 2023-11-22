@@ -894,7 +894,7 @@ data_tab <- data_tab[,c("acad","public",id_var)]
 
 #----  
 
-#Climate vulnerability  FIGURE 6----
+#Climate risk  FIGURE 6----
 #data from https://www.nature.com/articles/s41558-022-01437-y
 
   library(dplyr)
@@ -932,7 +932,7 @@ data_tab <- data_tab[,c("acad","public",id_var)]
       se = FALSE
     ) +
     geom_point(data=sub_acad, aes(x=ClimVuln_SSP585, y=acad),shape=1, color="#5C5C5C",size=4,stroke = 0.8)+
-    ylab("Research effort")+xlab("Climate vulnerability (SSP5-8.5)")+
+    ylab("Research effort")+xlab("Climate risk index (SSP5-8.5)")+
     theme(legend.position = "none")
   
   b <- ggplot(final_table, aes(x=ClimVuln_SSP585, y=public,color=1-Range_005))+ geom_point(size=2)+
@@ -952,7 +952,7 @@ data_tab <- data_tab[,c("acad","public",id_var)]
       se = FALSE
     ) +
     geom_point(data=sub_public, aes(x=ClimVuln_SSP585, y=public),shape=1, color="#5C5C5C",size=4,stroke = 0.8)+
-    ylab("Public attention")+xlab("Climate vulnerability (SSP5-8.5)")+
+    ylab("Public attention")+xlab("Climate risk index (SSP5-8.5)")+
     theme(legend.position = "none")
 
   fig6 <- gridExtra::grid.arrange(a,b,ncol=2)
@@ -968,11 +968,6 @@ data_tab <- data_tab[,c("acad","public",id_var)]
     #cor.test(THR_final_table$ClimVuln_SSP585, THR_final_table$public, method = "pearson", alternative = "less") 
     #TH public r=-0.53 p<0.001
   
-  #correlation between climate risk index and species range 
-  
-    #cor.test(final_table$ClimVuln_SSP585,final_table$Range_005, method = "pearson", alternative = "less")
-    #r=-0.43 p<0.001
-    
   ### find coordinates of fish to illustrate
     # identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
     # {
@@ -997,7 +992,7 @@ data_tab <- data_tab[,c("acad","public",id_var)]
 
 #----
   
-#Climate vulnerability  FIGURE S3----
+#Climate risk  FIGURE S3----
   #data from https://www.nature.com/articles/s41558-022-01437-y
   
   library(dplyr)
@@ -1027,7 +1022,7 @@ data_tab <- data_tab[,c("acad","public",id_var)]
       data = final_table[final_table$IUCN=="TH",],
       se = FALSE
     )+
-    ylab("Research effort")+xlab("Climate vulnerability (SSP1-2.6)")+
+    ylab("Research effort")+xlab("Climate risk index (SSP1-2.6)")+
     theme(legend.position = "none")
   
   b <- ggplot(final_table, aes(x=ClimVuln_SSP126, y=public,color=1-Range_005))+ geom_point(size=2)+
@@ -1046,7 +1041,7 @@ data_tab <- data_tab[,c("acad","public",id_var)]
       data = final_table[final_table$IUCN=="TH",],
       se = FALSE
     ) +
-    ylab("Public attention")+xlab("Climate vulnerability (SSP1-2.6)")+
+    ylab("Public attention")+xlab("Climate risk index (SSP1-2.6)")+
     theme(legend.position = "none")
   
   figS3 <- gridExtra::grid.arrange(a,b,ncol=2)
