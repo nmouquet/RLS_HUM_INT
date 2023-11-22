@@ -577,8 +577,11 @@ identifyPch <- function(x, y = NULL, n = length(x), plot = FALSE, pch = 19, ...)
           #r=0.65 p<0.001
         
         ###hexbin plot produced for reviewer #2
-          #hbin <- hexbin::hexbin(final_table$acad,final_table$public, xbins = 40)
-          #hexbin::plot(hbin)
+          hbin <- hexbin::hexbin(final_table$acad,final_table$public, xbins = 40)
+          hexbin::plot(hbin,xlab="Research effort", ylab="Public attention")
+          grobs <- grid::grid.grab()
+          str(grobs)
+          ggsave(here::here("tables_figures","hexbin.tiff"),device="tiff",grobs,width = 18, height = 12, units = "cm",dpi=300)
         
 #----
 
